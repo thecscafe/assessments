@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Impact Assessment Tool</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo img {
+            max-width: 200px;
+            height: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        table, th, td {
+            border: 1px solid #e0e0e0;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: 500;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .instructions {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #3498db;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 5px;
+        }
+        .button:hover {
+            background-color: #2980b9;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #edf7ff;
+            border: 1px solid #d4e6f1;
+            border-radius: 5px;
+            display: none;
+        }
+        .score-total {
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 15px;
+            color: #2c3e50;
+        }
+        input[type="number"] {
+            width: 60px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .contact-entry {
+            background-color: #f8f8f8;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #e0e0e0;
+        }
+        .contact-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .rating-factor {
+            margin-bottom: 10px;
+        }
+        .factor-description {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 3px;
+        }
+        .prioritized-list {
+            margin-top: 20px;
+        }
+        .high-priority {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+        .medium-priority {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        .low-priority {
+            background-color: #f8f9fa;
+            border-left: 4px solid #6c757d;
+        }
+        .contact-card {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .priority-label {
+            display: inline-block;
+            padding: 3px 8px;
+            font-size: 12px;
+            border-radius: 3px;
+            margin-right: 10px;
+        }
+        .high-label {
+            background-color: #28a745;
+            color: white;
+        }
+        .medium-label {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .low-label {
+            background-color: #6c757d;
+            color: white;
+        }
+        .score-breakdown {
+            font-size: 0.85em;
+            margin-top: 8px;
+            color: #495057;
+        }
+        .remove-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            float: right;
+        }
+        .remove-button:hover {
+            background-color: #c82333;
+        }
+        .factors-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Customer Impact Assessment Tool</h1>
+        <div class="logo">
+            <!-- Replace with your actual logo URL -->
+            <img src="../calculators/thecscafe.png" alt="The CS Cafe Logo">
+        </div>
+        
+        <div class="instructions">
+            <p><strong>Instructions:</strong> Use this tool to assess your customer contacts and identify which relationships have the highest potential to help with your job search. Add your contacts and rate them on each impact factor to get a prioritized list.</p>
+            <p><strong>Scoring guide:</strong> 1 = Low impact/value, 5 = Maximum impact/value</p>
+        </div>
+        
+        <div id="contactsContainer">
+            <!-- Contact entries will be added here -->
+        </div>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <button onclick="addContactEntry()" class="button">+ Add Contact</button>
+        </div>
+        
+        <div style="text-align: center;">
+            <button onclick="calculateScores()" class="button">Calculate Results</button>
+        </div>
+        
+        <div style="text-align: center; margin-top: 10px; display: none;" id="exportPdfButton">
+            <button onclick="exportResultsAsPDF()" class="button">Export Results as PDF</button>
+        </div>
+        
+        <div id="results" class="results">
+            <h2>Your Customer Impact Assessment Results</h2>
+            <p>Here are your contacts prioritized by their potential impact on your job search:</p>
+            <div id="prioritizedContacts" class="prioritized-list">
+                <!-- Will be populated by JavaScript -->
+            </div>
+            <div id="recommendation" style="margin-top: 25px;">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Counter for unique contact IDs
+        let contactCounter = 0;
+        
+        // Weights for each factor (can be adjusted)
+        const factorWeights = {
+            'revenue': 1.2,     // Revenue influence has highest weight
+            'authority': 1.1,   // Decision-making authority
+            'relationship': 1.0, // Relationship strength
+            'advocacy': 1.1,    // Advocacy level
+            'network': 1.0      // Network reach
+        };
+        
+        // Add a new contact entry form
+        function addContactEntry() {
+            const contactsContainer = document.getElementById('contactsContainer');
+            contactCounter++;
+            
+            const contactDiv = document.createElement('div');
+            contactDiv.className = 'contact-entry';
+            contactDiv.id = `contact-${contactCounter}`;
+            
+            contactDiv.innerHTML = `
+                <button class="remove-button" onclick="removeContact(${contactCounter})">Remove</button>
+                <h3>Contact #${contactCounter}</h3>
+                
+                <div class="contact-info">
+                    <div>
+                        <label for="name-${contactCounter}">Name:</label>
+                        <input type="text" id="name-${contactCounter}" placeholder="Contact Name">
+                    </div>
+                    <div>
+                        <label for="company-${contactCounter}">Company:</label>
+                        <input type="text" id="company-${contactCounter}" placeholder="Company Name">
+                    </div>
+                    <div>
+                        <label for="role-${contactCounter}">Role:</label>
+                        <input type="text" id="role-${contactCounter}" placeholder="Role/Title">
+                    </div>
+                </div>
+                
+                <h4>Impact Factors</h4>
+                <div class="factors-grid">
+                    <div class="rating-factor">
+                        <label for="revenue-${contactCounter}">Revenue Influence (1-5):</label>
+                        <input type="number" id="revenue-${contactCounter}" min="1" max="5" placeholder="Score" class="score-input">
+                        <div class="factor-description">How much revenue did this contact see you influence?</div>
+                    </div>
+                    
+                    <div class="rating-factor">
+                        <label for="authority-${contactCounter}">Decision-making Authority (1-5):</label>
+                        <input type="number" id="authority-${contactCounter}" min="1" max="5" placeholder="Score" class="score-input">
+                        <div class="factor-description">How high is this person in the decision chain?</div>
+                    </div>
+                    
+                    <div class="rating-factor">
+                        <label for="relationship-${contactCounter}">Relationship Strength (1-5):</label>
+                        <input type="number" id="relationship-${contactCounter}" min="1" max="5" placeholder="Score" class="score-input">
+                        <div class="factor-description">How strong is your relationship with this person?</div>
+                    </div>
+                    
+                    <div class="rating-factor">
+                        <label for="advocacy-${contactCounter}">Advocacy Level (1-5):</label>
+                        <input type="number" id="advocacy-${contactCounter}" min="1" max="5" placeholder="Score" class="score-input">
+                        <div class="factor-description">How likely is this person to advocate for you?</div>
+                    </div>
+                    
+                    <div class="rating-factor">
+                        <label for="network-${contactCounter}">Network Reach (1-5):</label>
+                        <input type="number" id="network-${contactCounter}" min="1" max="5" placeholder="Score" class="score-input">
+                        <div class="factor-description">How broad/valuable is this person's network?</div>
+                    </div>
+                </div>
+            `;
+            
+            contactsContainer.appendChild(contactDiv);
+        }
+        
+        // Remove a contact entry
+        function removeContact(id) {
+            const contactDiv = document.getElementById(`contact-${id}`);
+            contactDiv.parentNode.removeChild(contactDiv);
+        }
+        
+        // Calculate scores and prioritize contacts
+        function calculateScores() {
+            const contactEntries = document.querySelectorAll('.contact-entry');
+            
+            if (contactEntries.length === 0) {
+                alert('Please add at least one contact to assess.');
+                return;
+            }
+            
+            let scoredContacts = [];
+            
+            // Calculate weighted score for each contact
+            contactEntries.forEach(contactDiv => {
+                const contactId = contactDiv.id.split('-')[1];
+                
+                const name = document.getElementById(`name-${contactId}`).value.trim();
+                const company = document.getElementById(`company-${contactId}`).value.trim();
+                const role = document.getElementById(`role-${contactId}`).value.trim();
+                
+                if (!name || !company || !role) {
+                    alert('Please fill in all contact information fields.');
+                    return;
+                }
+                
+                const revenueScore = parseInt(document.getElementById(`revenue-${contactId}`).value) || 0;
+                const authorityScore = parseInt(document.getElementById(`authority-${contactId}`).value) || 0;
+                const relationshipScore = parseInt(document.getElementById(`relationship-${contactId}`).value) || 0;
+                const advocacyScore = parseInt(document.getElementById(`advocacy-${contactId}`).value) || 0;
+                const networkScore = parseInt(document.getElementById(`network-${contactId}`).value) || 0;
+                
+                if (revenueScore === 0 || authorityScore === 0 || relationshipScore === 0 || 
+                    advocacyScore === 0 || networkScore === 0) {
+                    alert('Please rate all impact factors for each contact.');
+                    return;
+                }
+                
+                // Calculate weighted score
+                const weightedScore = (
+                    revenueScore * factorWeights.revenue +
+                    authorityScore * factorWeights.authority +
+                    relationshipScore * factorWeights.relationship +
+                    advocacyScore * factorWeights.advocacy +
+                    networkScore * factorWeights.network
+                ) / Object.values(factorWeights).reduce((a, b) => a + b, 0);
+                
+                scoredContacts.push({
+                    name,
+                    company,
+                    role,
+                    scores: {
+                        revenue: revenueScore,
+                        authority: authorityScore,
+                        relationship: relationshipScore,
+                        advocacy: advocacyScore,
+                        network: networkScore
+                    },
+                    weightedScore: weightedScore
+                });
+            });
+            
+            // Sort contacts by weighted score (highest first)
+            scoredContacts.sort((a, b) => b.weightedScore - a.weightedScore);
+            
+            // Display prioritized contacts
+            displayPrioritizedContacts(scoredContacts);
+            
+            // Show results and export button
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('exportPdfButton').style.display = 'block';
+        }
+        
+        // Display prioritized contacts in results
+        function displayPrioritizedContacts(contacts) {
+            const prioritizedContactsDiv = document.getElementById('prioritizedContacts');
+            prioritizedContactsDiv.innerHTML = '';
+            
+            if (contacts.length === 0) return;
+            
+            // Determine priority thresholds
+            const highPriorityThreshold = 4.0;
+            const mediumPriorityThreshold = 3.0;
+            
+            contacts.forEach(contact => {
+                const contactCard = document.createElement('div');
+                
+                // Set priority class based on weighted score
+                let priorityClass, priorityLabel;
+                if (contact.weightedScore >= highPriorityThreshold) {
+                    priorityClass = 'high-priority';
+                    priorityLabel = '<span class="priority-label high-label">HIGH PRIORITY</span>';
+                } else if (contact.weightedScore >= mediumPriorityThreshold) {
+                    priorityClass = 'medium-priority';
+                    priorityLabel = '<span class="priority-label medium-label">MEDIUM PRIORITY</span>';
+                } else {
+                    priorityClass = 'low-priority';
+                    priorityLabel = '<span class="priority-label low-label">LOW PRIORITY</span>';
+                }
+                
+                contactCard.className = `contact-card ${priorityClass}`;
+                
+                // Format the content
+                contactCard.innerHTML = `
+                    <div>
+                        ${priorityLabel}
+                        <strong>${contact.name}</strong> - ${contact.role} at ${contact.company}
+                    </div>
+                    <div>
+                        <strong>Impact Score:</strong> ${contact.weightedScore.toFixed(1)} / 5
+                    </div>
+                    <div class="score-breakdown">
+                        Revenue Influence: ${contact.scores.revenue}/5 | 
+                        Decision Authority: ${contact.scores.authority}/5 | 
+                        Relationship: ${contact.scores.relationship}/5 | 
+                        Advocacy: ${contact.scores.advocacy}/5 | 
+                        Network: ${contact.scores.network}/5
+                    </div>
+                `;
+                
+                prioritizedContactsDiv.appendChild(contactCard);
+            });
+            
+            // Add recommendation based on contact scores
+            const recommendationDiv = document.getElementById('recommendation');
+            const highPriorityContacts = contacts.filter(c => c.weightedScore >= highPriorityThreshold);
+            
+            if (highPriorityContacts.length > 0) {
+                recommendationDiv.innerHTML = `
+                    <h3>Next Steps</h3>
+                    <p>You have <strong>${highPriorityContacts.length}</strong> high-priority contacts. Start with these individuals using the Executive-Level Outreach Framework from the CS Layoff Recovery System.</p>
+                    <p>Focus on reaching out to your high-priority contacts first, followed by medium-priority contacts. For each contact, personalize your outreach based on your specific relationship and the value you delivered during your time working together.</p>
+                `;
+            } else {
+                recommendationDiv.innerHTML = `
+                    <h3>Next Steps</h3>
+                    <p>While you don't have any high-priority contacts based on this assessment, begin with your highest-scoring contacts and use the standard outreach template from the CS Layoff Recovery System.</p>
+                    <p>Consider expanding your assessment to include more contacts, including second-degree connections who may be able to provide valuable introductions.</p>
+                `;
+            }
+        }
+        
+        // Export results as PDF
+        function exportResultsAsPDF() {
+            // Get the results element
+            const resultsElement = document.getElementById('results');
+            
+            // Create a temp div with a branded header
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="../calculators/thecscafe.png" alt="The CS Cafe Logo" style="max-width: 200px;">
+                    <h1 style="color: #2c3e50;">Customer Impact Assessment Results</h1>
+                    <p>Generated on ${new Date().toLocaleDateString()}</p>
+                </div>
+            `;
+            
+            // Clone the results content
+            const resultsContent = resultsElement.cloneNode(true);
+            tempDiv.appendChild(resultsContent);
+            
+            // Configure pdf options
+            const options = {
+                margin: [15, 15, 15, 15],
+                filename: 'customer-impact-assessment.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            // Generate and download the PDF
+            html2pdf().from(tempDiv).set(options).save();
+        }
+        
+        // Add initial contact entry when page loads
+        window.onload = function() {
+            addContactEntry();
+        };
+    </script>
+</body>
+</html>
